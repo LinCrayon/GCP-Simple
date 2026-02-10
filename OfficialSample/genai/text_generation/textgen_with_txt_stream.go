@@ -15,47 +15,44 @@
 // // Package text_generation shows examples of generating text using the GenAI SDK.
 package text_generation
 
-//
-//// [START googlegenaisdk_textgen_with_txt_stream]
-//import (
-//	"context"
-//	"fmt"
-//	"io"
-//
-//	genai "google.golang.org/genai"
-//)
-//
-//// generateWithTextStream shows how to generate text stream using a text prompt.
-//func generateWithTextStream(w io.Writer) error {
-//	ctx := context.Background()
-//
-//	client, err := genai.NewClient(ctx, &genai.ClientConfig{
-//		HTTPOptions: genai.HTTPOptions{APIVersion: "v1"},
-//	})
-//	if err != nil {
-//		return fmt.Errorf("failed to create genai client: %w", err)
-//	}
-//
-//	modelName := "gemini-2.5-flash"
-//	contents := genai.Text("Why is the sky blue?")
-//
-//	for resp, err := range client.Models.GenerateContentStream(ctx, modelName, contents, nil) {
-//		if err != nil {
-//			return fmt.Errorf("failed to generate content: %w", err)
-//		}
-//
-//		chunk := resp.Text()
-//
-//		fmt.Fprintln(w, chunk)
-//	}
-//
-//	// Example response:
-//	// The
-//	//  sky is blue
-//	//  because of a phenomenon called **Rayleigh scattering**. Here's the breakdown:
-//	// ...
-//
-//	return nil
-//}
-//
-//// [END googlegenaisdk_textgen_with_txt_stream]
+import (
+	"context"
+	"fmt"
+	"google.golang.org/genai"
+	"io"
+)
+
+// generateWithTextStream shows how to generate text stream using a text prompt.
+func generateWithTextStream(w io.Writer) error {
+	ctx := context.Background()
+
+	client, err := genai.NewClient(ctx, &genai.ClientConfig{
+		HTTPOptions: genai.HTTPOptions{APIVersion: "v1"},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create genai client: %w", err)
+	}
+
+	modelName := "gemini-2.5-flash"
+	contents := genai.Text("Why is the sky blue?")
+
+	stream := client.Models.GenerateContentStream(ctx, modelName, contents, nil)
+
+	var streamErr error
+
+	stream(func(resp *genai.GenerateContentResponse, err error) bool {
+		if err != nil {
+			streamErr = err
+			return false
+		}
+
+		fmt.Fprintln(w, resp.Text())
+		return true
+	})
+
+	if streamErr != nil {
+		return fmt.Errorf("failed to generate content: %w", streamErr)
+	}
+
+	return nil
+}

@@ -87,6 +87,23 @@ func TestGenerate(t *testing.T) {
 			t.Errorf("code execution did not succeed: %s", output)
 		}
 	})
+
+	t.Run("文本生成-流式回答 Why is the sky blue", func(t *testing.T) {
+		buf.Reset()
+
+		err := generateWithTextStream(buf)
+		if err != nil {
+			t.Fatalf("生成文本流失败: %v", err)
+		}
+
+		output := buf.String()
+		if output == "" {
+			t.Fatal("expected some text output, got empty")
+		}
+
+		t.Logf("模型输出:\n%s", output)
+	})
+
 }
 
 // 辅助函数：检查文本中是否包含关键字
