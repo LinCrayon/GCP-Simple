@@ -1,4 +1,4 @@
-package quickstart
+package text_generation
 
 import (
 	"bytes"
@@ -27,6 +27,19 @@ func TestGenerate(t *testing.T) {
 		}
 
 		t.Logf("模型输出:\n%s", output)
+	})
+
+	t.Run("使用自定义配置生成文本内容", func(t *testing.T) {
+
+		err := generateWithConfig(buf)
+		if err != nil {
+			t.Fatalf("文本生成失败: %v", err)
+		}
+
+		if buf.String() == "" {
+			t.Fatal("期望有输出内容，但结果为空")
+		}
+		t.Logf("模型输出:\n%s", buf.String())
 	})
 
 }
