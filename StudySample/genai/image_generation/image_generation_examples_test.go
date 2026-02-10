@@ -60,4 +60,18 @@ func TestImageGeneration(t *testing.T) {
 		}
 	})
 
+	t.Run("生成包含文本和图像的多模式 Flash 内容", func(t *testing.T) {
+		buf.Reset()
+		err := generateMMFlashTxtImgWithText(buf)
+		if err != nil {
+			t.Fatalf("generateMMFlashTxtImgWithText failed: %v", err)
+		}
+
+		// 函数预期会向 writer 输出生成的 Markdown 文件路径
+		output := buf.String()
+		if output == "" {
+			t.Error("期望有输出内容，但得到的是空字符串")
+		}
+	})
+
 }
