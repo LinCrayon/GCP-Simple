@@ -27,4 +27,17 @@ func TestTextGeneration(t *testing.T) {
 		}
 	})
 
+	t.Run("使用代码执行工具进行推理和计算", func(t *testing.T) {
+
+		err := generateWithCodeExec(buf)
+		if err != nil {
+			t.Fatalf("代码执行示例运行失败: %v", err)
+		}
+
+		if buf.String() == "" {
+			t.Fatal("期望有输出内容，但结果为空")
+		}
+		t.Log(buf.String())
+	})
+
 }
