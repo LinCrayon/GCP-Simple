@@ -74,4 +74,22 @@ func TestImageGeneration(t *testing.T) {
 		}
 	})
 
+	t.Run("使用多模态 Flash 模型进行图片编辑（文本 + 图片）", func(t *testing.T) {
+		// 短测试模式下跳过（避免 CI 或默认 go test 执行）
+		if testing.Short() {
+			t.Skip("跳过多模态图片编辑集成测试")
+		}
+		buf.Reset()
+		// 调用被测试函数
+		err := generateImageMMFlashEditWithTextImg(buf)
+		if err != nil {
+			t.Fatalf("执行图片编辑失败: %v", err)
+		}
+
+		output := buf.String()
+		if output == "" {
+			t.Fatal("期望有输出内容，但实际为空")
+		}
+	})
+
 }
