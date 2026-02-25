@@ -9,7 +9,7 @@ import (
 	genai "google.golang.org/genai"
 )
 
-// generateWithLocalVideo shows how to generate text using a local video input.
+// generateWithLocalVideo 展示如何使用本地视频输入生成文本。
 func generateWithLocalVideo(w io.Writer) error {
 	ctx := context.Background()
 
@@ -31,7 +31,7 @@ func generateWithLocalVideo(w io.Writer) error {
 		{
 			Role: "user",
 			Parts: []*genai.Part{
-				{Text: `Write a short and engaging blog post based on this video.`},
+				{Text: `根据该视频撰写一篇简短且引人入胜的博客文章。`},
 				{InlineData: &genai.Blob{
 					MIMEType: "video/mp4",
 					Data:     data,

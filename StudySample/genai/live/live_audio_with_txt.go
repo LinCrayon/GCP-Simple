@@ -18,7 +18,7 @@ func generateLiveAudioWithText(w io.Writer) error {
 		HTTPOptions: genai.HTTPOptions{APIVersion: "v1"},
 	})
 	if err != nil {
-		return fmt.Errorf("failed to create genai client: %w", err)
+		return fmt.Errorf("创建 genai 客户端失败： %w", err)
 	}
 
 	modelName := "gemini-2.0-flash-live-preview-04-09"
@@ -58,7 +58,7 @@ func generateLiveAudioWithText(w io.Writer) error {
 		},
 	})
 	if err != nil {
-		return fmt.Errorf("failed to send content: %w", err)
+		return fmt.Errorf("发送内容失败： %w", err)
 	}
 
 	// Receive streaming audio chunks

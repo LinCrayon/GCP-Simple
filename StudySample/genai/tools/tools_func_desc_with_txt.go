@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	genai "google.golang.org/genai"
+	"google.golang.org/genai"
 )
 
 // generateWithFuncCall 函数调用：演示 Gemini 模型如何不是直接回答问题，而是先“建议调用一个函数”，再利用函数返回的数据生成最终回答。
@@ -24,7 +24,6 @@ func generateWithFuncCall(w io.Writer) error {
 
 	// 定义一个可供模型调用的函数：获取指定城市的当前天气
 	weatherFunc := &genai.FunctionDeclaration{
-
 		Description: "返回指定地点的当前天气信息",
 		// 函数名称（模型会在 FunctionCall 中返回该名称）
 		Name: "getCurrentWeather",

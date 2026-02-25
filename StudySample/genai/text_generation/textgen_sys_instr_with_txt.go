@@ -8,7 +8,7 @@ import (
 	genai "google.golang.org/genai"
 )
 
-// generateWithSystem shows how to generate text using a text prompt and system instruction.
+// generateWithSystem 展示如何使用文本提示和系统指令生成文本。
 func generateWithSystem(w io.Writer) error {
 	ctx := context.Background()
 

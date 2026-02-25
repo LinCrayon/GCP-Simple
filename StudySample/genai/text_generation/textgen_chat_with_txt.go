@@ -16,40 +16,40 @@ func generateChatWithText(w io.Writer) error {
 		HTTPOptions: genai.HTTPOptions{APIVersion: "v1"},
 	})
 	if err != nil {
-		return fmt.Errorf("failed to create genai client: %w", err)
+		return fmt.Errorf("创建 genai 客户端失败： %w", err)
 	}
 	modelName := "gemini-2.5-flash"
 	history := []*genai.Content{
 		{
 			Role: genai.RoleUser,
 			Parts: []*genai.Part{
-				{Text: "Hello there"},
+				{Text: "你好呀"},
 			},
 		},
 		{
-			Role: "model",
+			Role: genai.RoleModel,
 			Parts: []*genai.Part{
-				{Text: "Great to meet you. What would you like to know?"},
+				{Text: "很高兴认识你。您想知道什么？"},
 			},
 		},
 	}
 	chatSession, err := client.Chats.Create(ctx, modelName, nil, history)
 	if err != nil {
-		return fmt.Errorf("failed to create genai chat session: %w", err)
+		return fmt.Errorf("无法创建 genai 聊天会话： %w", err)
 	}
-	contents := genai.Part{Text: "Tell me a story."}
+	contents := genai.Part{Text: "给我讲个故事吧。"}
 	resp, err := chatSession.SendMessage(ctx, contents)
 	if err != nil {
-		return fmt.Errorf("failed to send message: %w", err)
+		return fmt.Errorf("发送消息失败： %w", err)
 	}
 
 	respText := resp.Text()
 
 	fmt.Fprintln(w, respText)
-	// Example response:
-	// Okay, settle in. Let me tell you a story about a quiet cartographer, but not of lands and seas.
+	// 响应示例：
+	// 好吧，安顿下来。让我告诉你一个关于一位安静的制图师的故事，但不是关于陆地和海洋的故事。
 	// ...
-	// In the sleepy town of Oakhaven, nestled between the Whispering Hills and the Murmuring River, lived a woman named Elara.
+	// 在幽静的奥克黑文镇，坐落在低语山和低语河之间，住着一位名叫埃拉拉的女人。
 	// ...
 
 	return nil

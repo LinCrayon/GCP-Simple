@@ -22,9 +22,9 @@ func generateWithVideo(w io.Writer) error {
 	modelName := "gemini-2.5-flash"
 	contents := []*genai.Content{
 		{Parts: []*genai.Part{
-			{Text: `Analyze the provided video file, including its audio.
-Summarize the main points of the video concisely.
-Create a chapter breakdown with timestamps for key sections or topics discussed.`},
+			{Text: `分析提供的视频文件，包括其音频。
+简要概括视频的要点。
+使用时间戳为所讨论的关键部分或主题创建章节细分。`},
 			{FileData: &genai.FileData{
 				FileURI:  "gs://cloud-samples-data/generative-ai/video/pixel8.mp4",
 				MIMEType: "video/mp4",

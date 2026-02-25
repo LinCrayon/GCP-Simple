@@ -18,15 +18,15 @@ func generateMMFlashWithText(w io.Writer) error {
 		HTTPOptions: genai.HTTPOptions{APIVersion: "v1"},
 	})
 	if err != nil {
-		return fmt.Errorf("failed to create genai client: %w", err)
+		return fmt.Errorf("创建 genai 客户端失败： %w", err)
 	}
 
 	modelName := "gemini-2.5-flash-image"
 	contents := []*genai.Content{
 		{
 			Parts: []*genai.Part{ //内容，可以混合多种类型
-				{Text: "Generate an image of the Eiffel tower with fireworks in the background."},
-			}, //InlineData：二进制数据（图片 / 音频），FileData：GCS 文件
+				{Text: "生成背景为烟花的埃菲尔铁塔图像。"},
+			}, //InlineData：二进制数据（图片 / 音频）嵌入发送的，FileData：GCS 文件，流式传输
 			Role: genai.RoleUser, //谁说的
 		},
 	}
@@ -48,7 +48,7 @@ func generateMMFlashWithText(w io.Writer) error {
 		},
 	)
 	if err != nil {
-		return fmt.Errorf("failed to generate content: %w", err)
+		return fmt.Errorf("无法生成内容： %w", err)
 	}
 
 	if len(resp.Candidates) == 0 || resp.Candidates[0].Content == nil {
@@ -62,7 +62,7 @@ func generateMMFlashWithText(w io.Writer) error {
 		} else if part.InlineData != nil { //图片二进制
 			fileName = "example-image-eiffel-tower.png"
 			if err := os.WriteFile(fileName, part.InlineData.Data, 0o644); err != nil {
-				return fmt.Errorf("failed to save image: %w", err)
+				return fmt.Errorf("保存图像失败：%w", err)
 			}
 		}
 	}

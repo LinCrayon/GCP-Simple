@@ -38,10 +38,10 @@ func generateImageMMFlashEditWithTextImg(w io.Writer) error {
 	prompt := "请将这张图片编辑成卡通风格。"
 	contents := []*genai.Content{
 		{
-			Role: "user",
+			Role: genai.RoleUser,
 			Parts: []*genai.Part{
 				{Text: prompt}, //文本指令
-				{InlineData: &genai.Blob{ //输入图片
+				{InlineData: &genai.Blob{ //InlineData：二进制数据（图片 / 音频）嵌入发送的，FileData：GCS 文件，流式传输
 					MIMEType: "image/png",
 					Data:     image,
 				}},
@@ -79,7 +79,7 @@ func generateImageMMFlashEditWithTextImg(w io.Writer) error {
 			if len(part.InlineData.Data) > 0 {
 				// 将生成的图片保存为文件
 				if err := os.WriteFile(outputFile, part.InlineData.Data, 0644); err != nil {
-					return fmt.Errorf("failed to save image: %w", err)
+					return fmt.Errorf("保存图像失败： %w", err)
 				}
 				fmt.Fprintln(w, outputFile)
 			}

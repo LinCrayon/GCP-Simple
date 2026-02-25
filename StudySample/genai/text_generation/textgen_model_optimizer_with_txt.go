@@ -8,7 +8,7 @@ import (
 	"google.golang.org/genai"
 )
 
-// generateModelOptimizerWithTxt shows how to generate text using a text prompt and model optimizer.
+// generateModelOptimizerWithTxt 展示如何使用文本提示和模型优化器生成文本。
 func generateModelOptimizerWithTxt(w io.Writer) error {
 	ctx := context.Background()
 

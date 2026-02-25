@@ -8,7 +8,7 @@ import (
 	genai "google.golang.org/genai"
 )
 
-// generateWithYTVideo shows how to generate text using a YouTube video as input.
+// generateWithYTVideo 展示如何使用 YouTube 视频作为输入生成文本。
 func generateWithYTVideo(w io.Writer) error {
 	ctx := context.Background()
 
@@ -22,7 +22,7 @@ func generateWithYTVideo(w io.Writer) error {
 	modelName := "gemini-2.5-flash"
 	contents := []*genai.Content{
 		{Parts: []*genai.Part{
-			{Text: "Write a short and engaging blog post based on this video."},
+			{Text: "根据该视频撰写一篇简短且引人入胜的博客文章。"},
 			{FileData: &genai.FileData{
 				FileURI:  "https://www.youtube.com/watch?v=3KtWfp0UopM",
 				MIMEType: "video/mp4",

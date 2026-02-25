@@ -32,7 +32,7 @@ func generateVideoFromImage(w io.Writer, outputGCSURI string) error {
 	}
 
 	modelName := "veo-3.1-fast-generate-001"
-	prompt := "Extreme close-up of a cluster of vibrant wildflowers swaying gently in a sun-drenched meadow."
+	prompt := "一簇生机勃勃的野花在阳光普照的草地上轻轻摇曳的极端特写。"
 	operation, err := client.Models.GenerateVideos(ctx, modelName, prompt, image, config)
 	if err != nil {
 		return fmt.Errorf("failed to start video generation: %w", err)

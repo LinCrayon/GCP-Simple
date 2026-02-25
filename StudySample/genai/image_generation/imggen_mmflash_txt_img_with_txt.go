@@ -84,7 +84,7 @@ func generateMMFlashTxtImgWithText(w io.Writer) error {
 			imgFile := filepath.Join(outputFolder, fmt.Sprintf("example-image-%d.png", i+1))
 			// 将图片字节数据写入 PNG 文件
 			if err := os.WriteFile(imgFile, part.InlineData.Data, 0644); err != nil {
-				return fmt.Errorf("failed to save image: %w", err)
+				return fmt.Errorf("保存图像失败： %w", err)
 			}
 			// 在 Markdown 中插入图片引用
 			if _, err := fp.WriteString(fmt.Sprintf("![image](%s)", filepath.Base(imgFile))); err != nil {

@@ -22,9 +22,9 @@ func generateTextWithPDF(w io.Writer) error {
 	modelName := "gemini-2.5-flash"
 	contents := []*genai.Content{
 		{Parts: []*genai.Part{
-			{Text: `You are a highly skilled document summarization specialist.
-	Your task is to provide a concise executive summary of no more than 300 words.
-	Please summarize the given document for a general audience.`},
+			{Text: `您是一位技术精湛的文档摘要专家。
+	您的任务是提供不超过 300 字的简洁执行摘要。
+	请为一般读者总结给定的文件。`},
 			{FileData: &genai.FileData{
 				FileURI:  "gs://cloud-samples-data/generative-ai/pdf/1706.03762v7.pdf",
 				MIMEType: "application/pdf",

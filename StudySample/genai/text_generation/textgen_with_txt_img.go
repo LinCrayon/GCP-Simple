@@ -22,7 +22,7 @@ func generateWithTextImage(w io.Writer) error {
 	modelName := "gemini-2.5-flash"
 	contents := []*genai.Content{
 		{Parts: []*genai.Part{
-			{Text: "What is shown in this image?"},
+			{Text: "这张图片显示了什么？"},
 			{FileData: &genai.FileData{
 				// Image source: https://storage.googleapis.com/cloud-samples-data/generative-ai/image/scones.jpg
 				FileURI:  "gs://cloud-samples-data/generative-ai/image/scones.jpg",
