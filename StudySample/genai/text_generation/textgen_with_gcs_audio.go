@@ -22,9 +22,9 @@ func generateWithAudio(w io.Writer) error {
 	modelName := "gemini-2.5-flash"
 	contents := []*genai.Content{
 		{Parts: []*genai.Part{
-			{Text: `Provide the summary of the audio file.
-Summarize the main points of the audio concisely.
-Create a chapter breakdown with timestamps for key sections or topics discussed.`},
+			{Text: `提供音频文件的摘要。
+简要概括音频的要点。
+使用时间戳为所讨论的关键部分或主题创建章节细分。`},
 			{FileData: &genai.FileData{
 				FileURI:  "gs://cloud-samples-data/generative-ai/audio/pixel.mp3",
 				MIMEType: "audio/mpeg",
