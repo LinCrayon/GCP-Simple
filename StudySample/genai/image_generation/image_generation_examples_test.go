@@ -92,4 +92,19 @@ func TestImageGeneration(t *testing.T) {
 		}
 	})
 
+	t.Run("图片理解", func(t *testing.T) {
+
+		buf.Reset()
+		// 调用被测试函数
+		err := understandImage(buf)
+		if err != nil {
+			t.Fatalf("执行图片理解失败: %v", err)
+		}
+
+		output := buf.String()
+		if output == "" {
+			t.Fatal("期望有输出内容，但实际为空")
+		}
+	})
+
 }
