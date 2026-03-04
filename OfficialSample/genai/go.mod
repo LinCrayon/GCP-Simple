@@ -1,4 +1,4 @@
-module github.com/GoogleCloudPlatform/golang-samples/genai
+	module github.com/GoogleCloudPlatform/golang-samples/genai
 
 go 1.24.0
 

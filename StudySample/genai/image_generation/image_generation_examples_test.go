@@ -107,4 +107,30 @@ func TestImageGeneration(t *testing.T) {
 		}
 	})
 
+	t.Run("使用 Google 搜索工具根据实时信息（例如天气预报、股市图表或近期活动）生成图片", func(t *testing.T) {
+		buf.Reset()
+		err := generateMMFlashWithGoogleSearch(buf)
+		if err != nil {
+			t.Fatalf("generateMMFlashWithGoogleSearch failed: %v", err)
+		}
+
+		output := buf.String()
+		if output == "" {
+			t.Error("expected non-empty output, got empty")
+		}
+	})
+
+	t.Run("图片遮罩", func(t *testing.T) {
+		buf.Reset()
+		err := MaskImage(buf)
+		if err != nil {
+			t.Fatalf("MaskImage failed: %v", err)
+		}
+
+		output := buf.String()
+		if output == "" {
+			t.Error("expected non-empty output, got empty")
+		}
+	})
+
 }
