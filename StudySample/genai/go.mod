@@ -6,6 +6,7 @@ toolchain go1.24.13
 
 require (
 	cloud.google.com/go/aiplatform v1.115.0
+	cloud.google.com/go/texttospeech v1.16.0
 	github.com/GoogleCloudPlatform/golang-samples v0.0.0-20260102171605-e18ca2dbaba4
 	github.com/go-audio/audio v1.0.0
 	github.com/go-audio/wav v1.1.0

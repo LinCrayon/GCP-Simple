@@ -32,7 +32,7 @@ func generateWithLocalVideo(w io.Writer) error {
 			Role: "user",
 			Parts: []*genai.Part{
 				{Text: `根据该视频撰写一篇简短且引人入胜的博客文章。`},
-				{InlineData: &genai.Blob{
+				{InlineData: &genai.Blob{ //嵌入发送给AI用 InlineData
 					MIMEType: "video/mp4",
 					Data:     data,
 				}},
