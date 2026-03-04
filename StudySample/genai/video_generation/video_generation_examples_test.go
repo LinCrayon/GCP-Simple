@@ -204,7 +204,7 @@ func TestVideoGeneration(t *testing.T) {
 
 	t.Run("图生视频", func(t *testing.T) {
 		buf.Reset()
-		err := generateVideoFromImageMock(buf, outputGCSURI)
+		err := generateVideoFromImage(buf, outputGCSURI)
 		if err != nil {
 			t.Fatalf("generateVideoFromImage failed: %v", err)
 		}

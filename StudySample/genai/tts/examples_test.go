@@ -1,9 +1,11 @@
-package tts
+package main
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"testing"
+	"time"
 )
 
 func TestVideoGeneration(t *testing.T) {
@@ -119,6 +121,15 @@ Dr. Anya: And the call patterns are unlike anything we’ve recorded before.
 		)
 		if err != nil {
 			t.Fatalf("WriteWav failed: %v", err)
+		}
+	})
+
+	t.Run("视频中语音转文字输出json翻译后再转语音", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+		defer cancel()
+		err := audioToJsonToTTS(ctx)
+		if err != nil {
+			t.Fatalf("audioToJsonToTTS failed: %v", err)
 		}
 	})
 }

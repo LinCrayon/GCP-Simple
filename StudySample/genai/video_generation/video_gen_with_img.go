@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 	"time"
 
 	"google.golang.org/genai"
@@ -21,18 +22,25 @@ func generateVideoFromImage(w io.Writer, outputGCSURI string) error {
 		return fmt.Errorf("failed to create genai client: %w", err)
 	}
 
+	img, err := os.ReadFile("fruit.png")
+	if err != nil {
+		return fmt.Errorf("读取输入图片失败: %w", err)
+	}
+
 	image := &genai.Image{
-		GCSURI:   "gs://cloud-samples-data/generative-ai/image/flowers.png",
-		MIMEType: "image/png",
+		ImageBytes: img,
+		MIMEType:   "image/png",
 	}
 
 	config := &genai.GenerateVideosConfig{
-		AspectRatio:  "16:9",
-		OutputGCSURI: outputGCSURI,
+		NumberOfVideos:  1,                   // 只生成一个视频
+		GenerateAudio:   genai.Ptr(false),    // 关闭音频
+		AspectRatio:     "16:9",              // 视频宽高比
+		DurationSeconds: genai.Ptr(int32(4)), // 视频时长 4 秒
 	}
 
 	modelName := "veo-3.1-fast-generate-001"
-	prompt := "一簇生机勃勃的野花在阳光普照的草地上轻轻摇曳的极端特写。"
+	prompt := "一段电影级特写视频：木质果盘中装着红色苹果和紫色葡萄，放在明亮的厨房台面上。\n柔和的自然阳光缓慢变化，形成细腻的光影过渡。\n镜头缓慢推进，背景虚化。\n葡萄轻微晃动，仿佛被微风拂过。\n写实风格，高细节，画面稳定流畅。。"
 	operation, err := client.Models.GenerateVideos(ctx, modelName, prompt, image, config)
 	if err != nil {
 		return fmt.Errorf("failed to start video generation: %w", err)
@@ -48,8 +56,19 @@ func generateVideoFromImage(w io.Writer, outputGCSURI string) error {
 	}
 
 	if operation.Response != nil && len(operation.Response.GeneratedVideos) > 0 {
-		videoURI := operation.Response.GeneratedVideos[0].Video.URI
-		fmt.Fprintln(w, videoURI)
+		//videoURI := operation.Response.GeneratedVideos[0].Video.URI
+		videoBytes := operation.Response.GeneratedVideos[0].Video.VideoBytes
+		outputFile := "output-video.mp4"
+		if err := os.WriteFile(outputFile, videoBytes, 0644); err != nil {
+			return fmt.Errorf("failed to write video file: %w", err)
+		}
+
+		fmt.Fprintf(
+			w,
+			"Video saved locally: %s (%d bytes)\n",
+			outputFile,
+			len(videoBytes),
+		)
 		return nil
 	}
 
