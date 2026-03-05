@@ -27,8 +27,8 @@ func TestTextGeneration(t *testing.T) {
 		}
 	})
 
-	t.Run("使用代码执行工具进行推理和计算", func(t *testing.T) {
-
+	t.Run("code_execution_demo", func(t *testing.T) {
+		buf.Reset()
 		err := generateWithCodeExec(buf)
 		if err != nil {
 			t.Fatalf("代码执行示例运行失败: %v", err)
@@ -37,7 +37,20 @@ func TestTextGeneration(t *testing.T) {
 		if buf.String() == "" {
 			t.Fatal("期望有输出内容，但结果为空")
 		}
-		t.Log(buf.String())
+		t.Log("使用代码执行工具进行推理和计算：\n", buf.String())
+	})
+
+	t.Run("google_map", func(t *testing.T) {
+		buf.Reset()
+		err := generateWithGoogleMap(buf)
+		if err != nil {
+			t.Fatalf("google_map执行示例运行失败: %v", err)
+		}
+
+		if buf.String() == "" {
+			t.Fatal("期望有输出内容，但结果为空")
+		}
+		t.Log("使用google_map工具：\n", buf.String())
 	})
 
 }

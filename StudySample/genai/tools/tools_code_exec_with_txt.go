@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"os"
 
 	genai "google.golang.org/genai"
 )
@@ -15,7 +16,7 @@ func generateWithCodeExec(w io.Writer) error {
 	ctx := context.Background()
 
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
-		HTTPOptions: genai.HTTPOptions{APIVersion: "v1"},
+		APIKey: os.Getenv("GEMINI_API_KEY"),
 	})
 	if err != nil {
 		return fmt.Errorf("创建 genai 客户端失败: %w", err)
