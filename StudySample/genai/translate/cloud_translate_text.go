@@ -34,7 +34,7 @@ package translate
 //	defer client.Close()
 //
 //	// 注意：需要替换为你的项目ID
-//	projectID := "train-crayon-20260104"
+//	projectID := "train-crayon-20260304"
 //	location := "global" // Translation API 通常使用 global 位置
 //
 //	// 构建请求
@@ -82,7 +82,7 @@ package translate
 //	}
 //	defer client.Close()
 //
-//	projectID := "train-crayon-20260104"
+//	projectID := "train-crayon-20260304"
 //	location := "global"
 //
 //	req := &translatepb.TranslateTextRequest{

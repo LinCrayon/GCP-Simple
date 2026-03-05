@@ -76,6 +76,7 @@ func MaskImage(w io.Writer) error {
 		},
 		&genai.EditImageConfig{
 			EditMode: genai.EditModeInpaintInsertion,
+			//EditMode: genai.EditModeInpaintRemoval,
 		},
 	)
 	if err != nil {

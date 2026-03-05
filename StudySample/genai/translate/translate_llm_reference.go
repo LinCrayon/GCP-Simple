@@ -4,10 +4,11 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"golang.org/x/oauth2/google"
 	"io"
 	"os"
 	"strings"
+
+	"golang.org/x/oauth2/google"
 
 	aiplatform "cloud.google.com/go/aiplatform/apiv1"
 	"cloud.google.com/go/aiplatform/apiv1/aiplatformpb"
@@ -76,7 +77,7 @@ func translateWithReference(r io.Reader, out io.Writer) error {
 	}
 
 	req := &aiplatformpb.PredictRequest{
-		Endpoint:  "projects/train-crayon-20260104/locations/us-central1/publishers/google/models/translate-llm",
+		Endpoint:  "projects/train-crayon-20260304/locations/us-central1/publishers/google/models/translate-llm",
 		Instances: []*structpb.Value{structpb.NewStructValue(instance)},
 	}
 
