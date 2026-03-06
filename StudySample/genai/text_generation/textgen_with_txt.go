@@ -19,10 +19,17 @@ func generateWithText(w io.Writer) error {
 		return fmt.Errorf("failed to create genai client: %w", err)
 	}
 
+	val := int32(2000)
 	resp, err := client.Models.GenerateContent(ctx,
 		"gemini-2.5-flash",
 		genai.Text("How does AI work?"),
-		nil,
+		&genai.GenerateContentConfig{
+			ThinkingConfig: &genai.ThinkingConfig{
+				IncludeThoughts: true,                           //是否包含思考过程,答案包含(逻辑推导、最终答案)
+				ThinkingBudget:  &val,                           //思考预算/Token 限制
+				ThinkingLevel:   genai.ThinkingLevelUnspecified, //思考等级/深度 (自动选择根据模型选择平衡点)
+			},
+		},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to generate content: %w", err)

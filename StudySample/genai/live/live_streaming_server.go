@@ -18,6 +18,7 @@ package live
 
 import (
 	"context"
+	_ "embed"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -26,8 +27,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
-	_ "embed"
 
 	"github.com/gorilla/websocket"
 	"google.golang.org/genai"

@@ -2,10 +2,12 @@ package live
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"testing"
+	"time"
 )
 
 func generateLiveFuncCallWithTxtMock(w io.Writer) error {
@@ -144,7 +146,10 @@ func TestLiveGeneration(t *testing.T) {
 
 	t.Run("generate text with audio", func(t *testing.T) {
 		buf.Reset()
-		if err := generateLiveTextWithAudioMock(buf); err != nil {
+
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		if err := generateLiveTextWithAudio(ctx); err != nil {
 			t.Fatalf("generateLiveTextWithAudio failed: %v", err)
 		}
 
@@ -184,7 +189,7 @@ func TestLiveGeneration(t *testing.T) {
 	t.Run("generate live transcribe with audio", func(t *testing.T) {
 		buf.Reset()
 
-		err := generateLiveTranscribeWithAudioMock(buf)
+		err := generateLiveTranscribeWithAudio(buf)
 		if err != nil {
 			t.Fatalf("generateLiveTranscribeWithAudio failed: %v", err)
 		}
@@ -198,7 +203,7 @@ func TestLiveGeneration(t *testing.T) {
 	t.Run("generate live with text", func(t *testing.T) {
 		buf.Reset()
 
-		err := generateLiveWithTextMock(buf)
+		err := generateLiveWithText(buf)
 		if err != nil {
 			t.Fatalf("generateLiveWithText failed: %v", err)
 		}
@@ -213,7 +218,7 @@ func TestLiveGeneration(t *testing.T) {
 	t.Run("generate live audio with text", func(t *testing.T) {
 		buf.Reset()
 
-		err := generateLiveAudioWithTextMock(buf)
+		err := generateLiveAudioWithText(buf)
 		if err != nil {
 			t.Fatalf("generateLiveAudioWithText failed: %v", err)
 		}

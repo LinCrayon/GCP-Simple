@@ -13,7 +13,10 @@ func generateLiveTranscribeWithAudio(w io.Writer) error {
 	ctx := context.Background()
 
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
-		HTTPOptions: genai.HTTPOptions{APIVersion: "v1"},
+		//HTTPOptions: genai.HTTPOptions{APIVersion: "v1"},
+		Location: "us-central1",
+		Project:  "train-crayon-20260304",
+		Backend:  genai.BackendVertexAI,
 	})
 	if err != nil {
 		return fmt.Errorf("创建 genai 客户端失败: %w", err)
