@@ -1,4 +1,4 @@
-package main
+package music
 
 import (
 	"encoding/base64"
@@ -50,7 +50,7 @@ func GenerateMusicStream() {
 	sendJSON(conn, map[string]interface{}{"playbackControl": "PLAY"})
 
 	// 2. 创建 WAV 文件准备写入
-	outFile, err := os.Create("./music/lyria_music.wav")
+	outFile, err := os.Create("C:\\Users\\linshengqian\\Desktop\\GCP-Notes\\CodeSample\\GolangSample\\StudySample\\genai\\music\\lyria_music.wav")
 	if err != nil {
 		log.Fatal(err)
 	}
