@@ -21,7 +21,7 @@ func generateLiveAudioWithText(w io.Writer) error {
 		return fmt.Errorf("创建 genai 客户端失败： %w", err)
 	}
 
-	modelName := "gemini-2.0-flash-live-preview-04-09"
+	modelName := "gemini-live-2.5-flash-native-audio"
 
 	voiceName := "Aoede"
 
