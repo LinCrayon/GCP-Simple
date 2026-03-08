@@ -1,4 +1,4 @@
-package music
+package main
 
 import (
 	"testing"
@@ -9,7 +9,7 @@ func TestGenerate(t *testing.T) {
 	//	t.Skip("skipping integration test")
 	//}
 
-	t.Run("提出你的第一个请求", func(t *testing.T) {
+	t.Run("生成音乐", func(t *testing.T) {
 		GenerateMusicStream()
 	})
 }
