@@ -1,4 +1,4 @@
-package think_signature
+package think_signation
 
 import (
 	"context"
@@ -10,28 +10,31 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 // WeatherData 定义 Open-Meteo 返回的结构体（简化版）
 type WeatherData struct {
 	Current struct {
-		Temperature float64 `json:"temperature_2m"`
+		Temperature float64 `json:"temperature_2m"` // 当前温度（单位：摄氏度）
 	} `json:"current"`
 }
 
+// GeoData 用于根据城市名称获取经纬度
 type GeoData struct {
 	Results []struct {
-		Latitude  float64 `json:"latitude"`
-		Longitude float64 `json:"longitude"`
-		Name      string  `json:"name"`
+		Latitude  float64 `json:"latitude"`  // 纬度
+		Longitude float64 `json:"longitude"` // 经度
+		Name      string  `json:"name"`      // 城市名称
 	} `json:"results"`
 }
 
+// RSS 用于解析 Google News RSS
 type RSS struct {
 	Channel struct {
 		Items []struct {
-			Title string `xml:"title"`
-			Link  string `xml:"link"`
+			Title string `xml:"title"` // 新闻标题
+			Link  string `xml:"link"`  // 新闻链接
 		} `xml:"item"`
 	} `xml:"channel"`
 }
@@ -50,17 +53,17 @@ func thinkSignature() {
 
 	//////// 天气   ////////
 	weatherFunc := &genai.FunctionDeclaration{
-		Description: "获取指定地点的当前天气温度",
+		Description: "获取指定地点的当前天气温度", //函数描述（给模型看的）
 		Name:        "getWeather",
 		Parameters: &genai.Schema{
 			Type: "object",
-			Properties: map[string]*genai.Schema{
+			Properties: map[string]*genai.Schema{ //参数定义（JSON Schema）
 				"location": {
 					Type:        "string",
 					Description: "城市名称，例如：伦敦",
 				},
 			},
-			Required: []string{"location"},
+			Required: []string{"location"}, // 必填字段
 		},
 	}
 
@@ -81,6 +84,7 @@ func thinkSignature() {
 	}
 
 	config := &genai.GenerateContentConfig{
+		// 注册工具（Function Calling）
 		Tools: []*genai.Tool{
 			{
 				FunctionDeclarations: []*genai.FunctionDeclaration{
@@ -91,11 +95,11 @@ func thinkSignature() {
 		},
 		Temperature: genai.Ptr(float32(0.0)),
 		ThinkingConfig: &genai.ThinkingConfig{
-			IncludeThoughts: true,
+			IncludeThoughts: true, // 开启思考链
 		},
 	}
 
-	prompt := "中国深圳天气"
+	prompt := "获取福建新闻和哈尔滨的天气"
 
 	contents := []*genai.Content{
 		{Parts: []*genai.Part{
@@ -110,36 +114,55 @@ func thinkSignature() {
 		log.Fatal("failed to generate content: %w", err)
 	}
 
-	var funcCall *genai.FunctionCall
+	var funcCalls []*genai.FunctionCall
 	for _, p := range resp.Candidates[0].Content.Parts {
+		// 如果模型建议调用函数
 		if p.FunctionCall != nil {
-			funcCall = p.FunctionCall
-			fmt.Printf("The model suggests to call the function ")
-			fmt.Printf("%q with args: %v\n", funcCall.Name, funcCall.Args)
+			funcCalls = append(funcCalls, p.FunctionCall)
+			fmt.Printf("The model suggests to call the function %q with args: %v\n",
+				p.FunctionCall.Name, p.FunctionCall.Args)
 		}
 	}
-	if funcCall == nil {
-		log.Fatal("model did not suggest a function call")
+	if funcCalls == nil {
+		log.Println("model did not suggest a function call")
 	}
 
-	var result map[string]any
+	var toolParts []*genai.Part
+	//var weatherResult map[string]any
+	//var newsResult map[string]any
 
-	switch funcCall.Name {
+	for _, fc := range funcCalls {
 
-	case "getWeather":
-		fmt.Println("正在获取天气...")
-		result, err = getRealWeather(funcCall.Args["location"].(string))
+		var result map[string]any
+		var err error
 
-	case "getNews":
-		fmt.Println("正在获取新闻...")
-		result, err = getNews(funcCall.Args["topic"].(string))
+		switch fc.Name {
 
-	default:
-		log.Fatalf("未知函数: %s", funcCall.Name)
-	}
+		case "getWeather":
+			fmt.Println("正在获取天气...")
+			result, err = getRealWeather(fc.Args["location"].(string))
+			//weatherResult = result
 
-	if err != nil {
-		log.Fatal(err)
+		case "getNews":
+			fmt.Println("正在获取新闻...")
+			result, err = getNews(fc.Args["topic"].(string))
+			//newsResult = result
+
+		default:
+			log.Printf("未知函数: %s\n", fc.Name)
+		}
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// 构造 FunctionResponse
+		toolParts = append(toolParts, &genai.Part{
+			FunctionResponse: &genai.FunctionResponse{
+				Name:     fc.Name,
+				Response: result,
+			},
+		})
 	}
 
 	history := []*genai.Content{
@@ -151,18 +174,14 @@ func thinkSignature() {
 				},
 			},
 		},
+		// 模型的 FunctionCall
 		resp.Candidates[0].Content,
 		{
-			Role: "tool",
-			Parts: []*genai.Part{{
-				FunctionResponse: &genai.FunctionResponse{
-					Name:     funcCall.Name,
-					Response: result,
-				},
-			}},
+			Role:  "tool",
+			Parts: toolParts,
 		},
 	}
-
+	//第二次调用模型生成最终回答
 	resp, err = client.Models.GenerateContent(ctx, modelName, history, config)
 	if err != nil {
 		log.Fatal("failed to generate content: %w", err)
@@ -171,50 +190,40 @@ func thinkSignature() {
 	respText := resp.Text()
 	fmt.Println(respText)
 
+	//err = generateImage(ctx, client, weatherResult, newsResult)
+	//if err != nil {
+	//	log.Println("生成图片失败:", err)
+	//} else {
+	//	fmt.Println("图片生成成功: report.png")
+	//}
+
 }
 
-func translateCity(city string) string {
+func translate(text string) string {
 
-	cityMap := map[string]string{
-		"深圳": "Shenzhen",
-		"北京": "Beijing",
-		"上海": "Shanghai",
-		"广州": "Guangzhou",
-		"杭州": "Hangzhou",
-		"东京": "Tokyo",
-		"纽约": "New York",
-		"伦敦": "London",
-		"巴黎": "Paris",
+	url := fmt.Sprintf(
+		"https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=%s",
+		url.QueryEscape(text),
+	)
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return text
 	}
 
-	if v, ok := cityMap[city]; ok {
-		return v
-	}
+	defer resp.Body.Close()
 
-	return city
-}
+	body, _ := io.ReadAll(resp.Body)
 
-func translateTopic(topic string) string {
+	var result []any
+	json.Unmarshal(body, &result)
 
-	m := map[string]string{
-		"中国": "China",
-		"美国": "USA",
-		"日本": "Japan",
-		"科技": "technology",
-		"经济": "economy",
-		"AI": "AI",
-	}
-
-	if v, ok := m[topic]; ok {
-		return v
-	}
-
-	return topic
+	return result[0].([]any)[0].([]any)[0].(string)
 }
 
 // 获取真实天气的函数
 func getRealWeather(location string) (map[string]any, error) {
-	location = translateCity(location)
+	location = translate(location)
 	// 1 获取经纬度
 	geoURL := fmt.Sprintf(
 		"https://geocoding-api.open-meteo.com/v1/search?name=%s&count=1",
@@ -264,7 +273,7 @@ func getRealWeather(location string) (map[string]any, error) {
 
 func getNews(topic string) (map[string]any, error) {
 
-	topic = translateTopic(topic)
+	topic = translate(topic)
 
 	url := fmt.Sprintf(
 		"https://news.google.com/rss/search?q=%s&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
@@ -302,39 +311,84 @@ func getNews(topic string) (map[string]any, error) {
 	}, nil
 }
 
-/*funcResp := &genai.FunctionResponse{
-	Name: "getWeather",
-	Response: map[string]any{
-		"location":         "Boston",
-		"temperature":      "38",
-		"temperature_unit": "F",
-		"description":      "Cold and cloudy",
-		"humidity":         "65",
-		"wind":             `{"speed": "10", "direction": "NW"}`,
-	},
+func generateImage(ctx context.Context,
+	client *genai.Client,
+	weather map[string]any,
+	news map[string]any,
+) error {
+
+	location := weather["location"]
+	temp := weather["temperature"]
+	topic := news["topic"]
+
+	list := news["news"].([]map[string]string)
+
+	newsText := ""
+	for i, n := range list {
+
+		if i >= 5 {
+			break
+		}
+
+		newsText += fmt.Sprintf("%d. %s\n", i+1, n["title"])
+	}
+
+	// 让 Gemini 生成海报
+	prompt := fmt.Sprintf(`
+设计一张科技风格的信息海报：
+
+城市: %v
+温度: %v
+
+新闻主题: %v
+
+新闻:
+%v
+
+要求：
+- 信息图风格
+- 天气图标
+- 新闻列表
+- 蓝色科技背景
+`, location, temp, topic, newsText)
+
+	model := "gemini-2.0-flash-preview-image-generation"
+
+	resp, err := client.Models.GenerateContent(
+		ctx,
+		model,
+		[]*genai.Content{
+			{
+				Role: "user",
+				Parts: []*genai.Part{
+					{Text: prompt},
+				},
+			},
+		},
+		nil,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	for _, part := range resp.Candidates[0].Content.Parts {
+
+		if part.InlineData != nil {
+
+			err := os.WriteFile(
+				"report.png",
+				part.InlineData.Data,
+				0644,
+			)
+
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}
+	}
+
+	return fmt.Errorf("没有返回图片")
 }
-contents = []*genai.Content{
-	{
-		Parts: []*genai.Part{
-			{
-				Text: "波士顿的天气怎么样",
-			},
-		},
-		Role: genai.RoleUser,
-	},
-	{
-		Parts: []*genai.Part{
-			{
-				FunctionCall: funcCall,
-			},
-		},
-	},
-	{
-		Parts: []*genai.Part{
-			{
-				FunctionResponse: funcResp,
-			},
-		},
-	},
-}
-*/

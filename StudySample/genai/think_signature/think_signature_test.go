@@ -1,4 +1,4 @@
-package think_signature
+package think_signation
 
 import "testing"
 
