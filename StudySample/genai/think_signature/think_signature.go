@@ -92,10 +92,28 @@ func thinkSignature() {
 					newsFunc,
 				},
 			},
+			//{
+			//	GoogleSearch: &genai.GoogleSearch{},
+			//},
 		},
 		Temperature: genai.Ptr(float32(0.0)),
 		ThinkingConfig: &genai.ThinkingConfig{
 			IncludeThoughts: true, // 开启思考链
+		},
+		SafetySettings: []*genai.SafetySetting{
+			//Category → 内容类型 、Threshold → 拦截级别
+			{
+				Category:  genai.HarmCategoryDangerousContent,    //危险内容
+				Threshold: genai.HarmBlockThresholdBlockOnlyHigh, //高风险
+			},
+			{
+				Category:  genai.HarmCategoryHateSpeech,                //仇恨言论
+				Threshold: genai.HarmBlockThresholdBlockMediumAndAbove, //中风险
+			},
+			{
+				Category:  genai.HarmCategorySexuallyExplicit,          //色情内容
+				Threshold: genai.HarmBlockThresholdBlockMediumAndAbove, //中风险
+			},
 		},
 	}
 
