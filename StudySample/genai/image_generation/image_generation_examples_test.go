@@ -60,4 +60,77 @@ func TestImageGeneration(t *testing.T) {
 		}
 	})
 
+	t.Run("生成包含文本和图像的多模式 Flash 内容", func(t *testing.T) {
+		buf.Reset()
+		err := generateMMFlashTxtImgWithText(buf)
+		if err != nil {
+			t.Fatalf("generateMMFlashTxtImgWithText failed: %v", err)
+		}
+
+		// 函数预期会向 writer 输出生成的 Markdown 文件路径
+		output := buf.String()
+		if output == "" {
+			t.Error("期望有输出内容，但得到的是空字符串")
+		}
+	})
+
+	t.Run("使用多模态 Flash 模型进行图片编辑（文本 + 图片）", func(t *testing.T) {
+		// 短测试模式下跳过（避免 CI 或默认 go test 执行）
+		if testing.Short() {
+			t.Skip("跳过多模态图片编辑集成测试")
+		}
+		buf.Reset()
+		// 调用被测试函数
+		err := generateImageMMFlashEditWithTextImg(buf)
+		if err != nil {
+			t.Fatalf("执行图片编辑失败: %v", err)
+		}
+
+		output := buf.String()
+		if output == "" {
+			t.Fatal("期望有输出内容，但实际为空")
+		}
+	})
+
+	t.Run("图片理解", func(t *testing.T) {
+
+		buf.Reset()
+		// 调用被测试函数
+		err := understandImage(buf)
+		if err != nil {
+			t.Fatalf("执行图片理解失败: %v", err)
+		}
+
+		output := buf.String()
+		if output == "" {
+			t.Fatal("期望有输出内容，但实际为空")
+		}
+	})
+
+	t.Run("使用 Google 搜索工具根据实时信息（例如天气预报、股市图表或近期活动）生成图片", func(t *testing.T) {
+		buf.Reset()
+		err := generateMMFlashWithGoogleSearch(buf)
+		if err != nil {
+			t.Fatalf("generateMMFlashWithGoogleSearch failed: %v", err)
+		}
+
+		output := buf.String()
+		if output == "" {
+			t.Error("expected non-empty output, got empty")
+		}
+	})
+
+	t.Run("图片遮罩", func(t *testing.T) {
+		buf.Reset()
+		err := MaskImage(buf)
+		if err != nil {
+			t.Fatalf("MaskImage failed: %v", err)
+		}
+
+		output := buf.String()
+		if output == "" {
+			t.Error("expected non-empty output, got empty")
+		}
+	})
+
 }

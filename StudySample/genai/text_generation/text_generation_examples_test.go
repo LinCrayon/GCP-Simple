@@ -1,34 +1,46 @@
-// Copyright 2025 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package text_generation
 
 import (
 	"bytes"
 	"testing"
-
-	"github.com/GoogleCloudPlatform/golang-samples/internal/testutil"
 )
 
-func TestTextGeneration(t *testing.T) {
-	tc := testutil.SystemTest(t)
-
-	t.Setenv("GOOGLE_GENAI_USE_VERTEXAI", "1")
-	t.Setenv("GOOGLE_CLOUD_LOCATION", "us-central1")
-	t.Setenv("GOOGLE_CLOUD_PROJECT", tc.ProjectID)
+func TestGenerate(t *testing.T) {
+	//t.Helper()
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
 
 	buf := new(bytes.Buffer)
+
+	t.Run("文本生成-流式回答 Why is the sky blue", func(t *testing.T) {
+		buf.Reset()
+
+		err := generateWithTextStream(buf)
+		if err != nil {
+			t.Fatalf("生成文本流失败: %v", err)
+		}
+
+		output := buf.String()
+		if output == "" {
+			t.Fatal("expected some text output, got empty")
+		}
+
+		t.Logf("模型输出:\n%s", output)
+	})
+
+	t.Run("使用自定义配置生成文本内容", func(t *testing.T) {
+
+		err := generateWithConfig(buf)
+		if err != nil {
+			t.Fatalf("文本生成失败: %v", err)
+		}
+
+		if buf.String() == "" {
+			t.Fatal("期望有输出内容，但结果为空")
+		}
+		t.Logf("模型输出:\n%s", buf.String())
+	})
 
 	t.Run("generate with text prompt", func(t *testing.T) {
 		buf.Reset()
@@ -43,37 +55,11 @@ func TestTextGeneration(t *testing.T) {
 		}
 	})
 
-	t.Run("generate with text prompt and custom configuration", func(t *testing.T) {
-		buf.Reset()
-		err := generateWithConfig(buf)
-		if err != nil {
-			t.Fatalf("generateWithConfig failed: %v", err)
-		}
-
-		output := buf.String()
-		if output == "" {
-			t.Error("expected non-empty output, got empty")
-		}
-	})
-
 	t.Run("generate with text prompt and system instructions", func(t *testing.T) {
 		buf.Reset()
 		err := generateWithSystem(buf)
 		if err != nil {
 			t.Fatalf("generateWithSystem failed: %v", err)
-		}
-
-		output := buf.String()
-		if output == "" {
-			t.Error("expected non-empty output, got empty")
-		}
-	})
-
-	t.Run("generate stream with text prompt", func(t *testing.T) {
-		buf.Reset()
-		err := generateWithTextStream(buf)
-		if err != nil {
-			t.Fatalf("generateWithTextStream failed: %v", err)
 		}
 
 		output := buf.String()
@@ -187,18 +173,18 @@ func TestTextGeneration(t *testing.T) {
 		}
 	})
 
-	//t.Run("generate chat stream with text prompt", func(t *testing.T) {
-	//	buf.Reset()
-	//	err := generateChatStreamWithText(buf)
-	//	if err != nil {
-	//		t.Fatalf("generateChatStreamWithText failed: %v", err)
-	//	}
-	//
-	//	output := buf.String()
-	//	if output == "" {
-	//		t.Error("expected non-empty output, got empty")
-	//	}
-	//})
+	t.Run("generate chat stream with text prompt", func(t *testing.T) {
+		buf.Reset()
+		err := generateChatStreamWithText(buf)
+		if err != nil {
+			t.Fatalf("generateChatStreamWithText failed: %v", err)
+		}
+
+		output := buf.String()
+		if output == "" {
+			t.Error("expected non-empty output, got empty")
+		}
+	})
 
 	t.Run("generate Text With PDF", func(t *testing.T) {
 		buf.Reset()
